@@ -61,7 +61,7 @@ public class SubscriberService {
             Page<Subscriber> pageSubscriber = subscriberRepository.findAll(paging);
             subscriberList = pageSubscriber.getContent();
 
-            PagedResponse<Subscriber> pagedResponse = new PagedResponse(subscriberList,0,pageSubscriber.getTotalElements(),pageSubscriber.getTotalPages());
+            PagedResponse<Subscriber> pagedResponse = new PagedResponse(subscriberList,page,pageSubscriber.getTotalElements(),pageSubscriber.getTotalPages());
 
             return  new ResponseEntity<>(pagedResponse,HttpStatus.OK);
         } catch (Exception e){
@@ -109,5 +109,38 @@ public class SubscriberService {
             logger.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * checks if subscriber exists by phoneNumber
+     * @param phoneNumber
+     * @return
+     */
+    public Boolean subscriberExistsByPhoneNumber(String phoneNumber){
+        if(subscriberRepository.existsByPhoneNumber(phoneNumber)){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * gets subscriber
+     * @param phoneNumber
+     * @return
+     */
+    public Subscriber getSubscriberByPhoneNumber(
+            String phoneNumber
+    ){
+        if(subscriberExistsByPhoneNumber(phoneNumber)){
+            return subscriberRepository.findByPhoneNumber(phoneNumber).get();
+        }
+        return null;
+    }
+
+    public Subscriber saveSubscriber(Subscriber subscriber){
+        if ( subscriber != null){
+            subscriberRepository.save(subscriber);
+        }
+        return  null;
     }
 }
