@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.loaning</groupId>
 	<artifactId>loan-repay</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>loan-repay</name>
 	<description>Loaning and repayment api</description>
 	<properties>
