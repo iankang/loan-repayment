@@ -19,8 +19,6 @@ services:
     command:
       - -p 5433
 
-
-
   app:
     container_name:  lending-repay-api
     image: lending-repay-api:latest
