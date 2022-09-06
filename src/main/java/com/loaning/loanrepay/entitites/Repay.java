@@ -27,4 +27,9 @@ public class Repay  extends Auditable implements Serializable {
     Subscriber subscriber;
 
     BigDecimal amountPaid;
+
+    public Repay(Subscriber subscriber, BigDecimal amountPaid) {
+        this.subscriber = subscriber;
+        this.amountPaid = amountPaid;
+    }
 }
