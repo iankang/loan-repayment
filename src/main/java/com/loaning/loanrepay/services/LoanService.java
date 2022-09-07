@@ -110,7 +110,7 @@ public class LoanService {
                         subscriberService.saveSubscriber(subscriber);
                         return new ResponseEntity<Loans>(loansRepository.save(loan),HttpStatus.OK);
                     } else {
-                        return new ResponseEntity<>(new ErrorResponse("the amount exceeds the allowable limit. You can access Ksh. :  "+ subscriber.getBorrowableAmount()),HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<>(new ErrorResponse("the amount exceeds the allowable limit. You can access Ksh. "+ subscriber.getBorrowableAmount()),HttpStatus.BAD_REQUEST);
                     }
                 }
             }else {

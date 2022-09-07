@@ -1,6 +1,7 @@
 version: '3.1'
 volumes:
   db-data:
+  sftp-data:
 services:
   dbPostgresql:
     image: postgres
@@ -34,3 +35,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - sftp-data
+    ports:
+      - "2222:22"
+    command: foo:pass:1001
