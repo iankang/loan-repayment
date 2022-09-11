@@ -1,6 +1,7 @@
 package com.loaning.loanrepay.controllers;
 
 import com.loaning.loanrepay.entitites.Subscriber;
+import com.loaning.loanrepay.exceptions.ConflictException;
 import com.loaning.loanrepay.models.requests.SubscriberRequest;
 import com.loaning.loanrepay.models.responses.PagedResponse;
 import com.loaning.loanrepay.services.SubscriberService;
@@ -30,12 +31,16 @@ public class SubscriberController {
 
     @Operation(summary = "Add a subscriber", description = "Adds a subscriber to the system", tags = {"Subscriber"})
     @PostMapping("/addSubscriber")
-    public ResponseEntity<?> addSubscriber(
+    public ResponseEntity addSubscriber(
             @Parameter(description = "subscriber details", required = true)
             @RequestBody SubscriberRequest subscriberRequest
     ){
 
-        return  subscriberService.addSubscriber(subscriberRequest);
+        //check if subscriber phone number is added.
+        if (subscriberService.subscriberExistsByPhoneNumber(subscriberRequest.getPhoneNumber())){
+            throw new ConflictException("subscriber already exists");
+        }
+        return new ResponseEntity<>(subscriberService.saveSubscriber(subscriberRequest),HttpStatus.OK);
     }
 
     @Operation(summary = "Get all subscribers", description = "Gets all subscribers in the system", tags = {"Subscriber"})

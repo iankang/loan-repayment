@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubscriberService {
@@ -31,17 +32,21 @@ public class SubscriberService {
      * @param subscriberRequest
      * @return
      */
-    public ResponseEntity<?> addSubscriber(SubscriberRequest subscriberRequest){
-        try{
-            //check if subscriber phone number is added.
-            if (subscriberRepository.existsByPhoneNumber(subscriberRequest.getPhoneNumber())){
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
-            return new ResponseEntity<>(subscriberRepository.save(new Subscriber(subscriberRequest.getPhoneNumber(),subscriberRequest.getUsername())),HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+//    public ResponseEntity<?> addSubscriber(SubscriberRequest subscriberRequest){
+//        try{
+//            //check if subscriber phone number is added.
+//            if (subscriberRepository.existsByPhoneNumber(subscriberRequest.getPhoneNumber())){
+//                return new ResponseEntity<>(HttpStatus.CONFLICT);
+//            }
+//            return new ResponseEntity<>(subscriberRepository.save(new Subscriber(subscriberRequest.getPhoneNumber(),subscriberRequest.getUsername())),HttpStatus.OK);
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//     }
+     public Subscriber addSubscriber(SubscriberRequest subscriberRequest){
+
+         return saveSubscriber(subscriberRequest);
      }
 
     /**
@@ -126,20 +131,45 @@ public class SubscriberService {
     /**
      * gets subscriber
      * @param phoneNumber
-     * @return
+     * @return Subscriber
      */
-    public Subscriber getSubscriberByPhoneNumber(
+    public Optional<Subscriber> getSubscriberByPhoneNumber(
             String phoneNumber
     ){
-        if(subscriberExistsByPhoneNumber(phoneNumber)){
-            return subscriberRepository.findByPhoneNumber(phoneNumber).get();
-        }
-        return null;
+        return subscriberRepository.findByPhoneNumber(phoneNumber);
+
     }
 
-    public Subscriber saveSubscriber(Subscriber subscriber){
-        if ( subscriber != null){
+    public Optional<Subscriber> getSubscriberOptionalByPhoneNumber(
+            String phoneNumber
+    ){
+        return subscriberRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    /**
+     * save subscriber to database
+     * @param subscriberRequest
+     * @return Subscriber
+     */
+    public Subscriber saveSubscriber(SubscriberRequest subscriberRequest){
+
+        Subscriber subscriber = new Subscriber(subscriberRequest.getPhoneNumber(),subscriberRequest.getUsername());
+        subscriberRepository.save(subscriber);
+        return subscriber;
+    }
+
+    /**
+     * updates already existing subscriber
+     * @param phoneNumber
+     * @param subscriber
+     * @return Subscriber
+     */
+    public Subscriber updateSubscriber(String phoneNumber,Subscriber subscriber){
+
+        if (subscriberExistsByPhoneNumber(phoneNumber)) {
+
             subscriberRepository.save(subscriber);
+            return  subscriber;
         }
         return  null;
     }

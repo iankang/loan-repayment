@@ -71,7 +71,7 @@ public class RepayService {
         try{
             if(subscriberService.subscriberExistsByPhoneNumber(phoneNumber)){
 
-                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber);
+                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber).get();
 
                 List<Repay> repayList;
                 Pageable pageable = PageRequest.of(page,size);
@@ -102,7 +102,7 @@ public class RepayService {
     ){
         try{
             if (subscriberService.subscriberExistsByPhoneNumber(phoneNumber)){
-                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber);
+                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber).get();
                 if(subscriber != null){
                     BigDecimal loanAmount = subscriber.getLimitAmount().subtract(subscriber.getBorrowableAmount());
                     logger.info("loan-amount: "+ loanAmount);
@@ -111,7 +111,7 @@ public class RepayService {
                         Repay repay = new Repay(subscriber,repayAmount);
                         BigDecimal balance = subscriber.getBorrowableAmount().add(repayAmount);
                         subscriber.setBorrowableAmount(balance);
-                        subscriberService.saveSubscriber(subscriber);
+                        subscriberService.updateSubscriber(phoneNumber,subscriber);
                         return new ResponseEntity<Repay>(repayRepository.save(repay),HttpStatus.OK);
                     } else {
                         return new ResponseEntity<>(new ErrorResponse("the amount exceeds the loan. Your loan amount:  "+ loanAmount),HttpStatus.BAD_REQUEST);

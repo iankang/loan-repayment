@@ -2,6 +2,7 @@ package com.loaning.loanrepay.services;
 
 import com.loaning.loanrepay.entitites.Loans;
 import com.loaning.loanrepay.entitites.Subscriber;
+import com.loaning.loanrepay.exceptions.NotFoundException;
 import com.loaning.loanrepay.models.responses.ErrorResponse;
 import com.loaning.loanrepay.models.responses.PagedResponse;
 import com.loaning.loanrepay.repositories.LoansRepository;
@@ -69,7 +70,7 @@ public class LoanService {
         try{
             if(subscriberService.subscriberExistsByPhoneNumber(phoneNumber)){
 
-                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber);
+                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber).get();
 
                 List<Loans> loansList;
                 Pageable pageable = PageRequest.of(page,size);
@@ -80,7 +81,7 @@ public class LoanService {
                 PagedResponse<Loans> loansPagedResponse = new PagedResponse<>(loansList,page,loansPage.getTotalElements(),loansPage.getTotalPages());
                 return new ResponseEntity<>(loansPagedResponse, HttpStatus.OK);
             }else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                throw new NotFoundException("subscriber with phone number: "+phoneNumber+" non existent");
             }
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -100,14 +101,14 @@ public class LoanService {
     ){
         try{
             if (subscriberService.subscriberExistsByPhoneNumber(phoneNumber)){
-                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber);
+                Subscriber subscriber = subscriberService.getSubscriberByPhoneNumber(phoneNumber).get();
                 if(subscriber != null){
                     if(borrowAmount.compareTo(subscriber.getBorrowableAmount()) < 0){
 
                         Loans loan = new Loans(subscriber,borrowAmount);
                         BigDecimal balance = subscriber.getBorrowableAmount().subtract(borrowAmount);
                         subscriber.setBorrowableAmount(balance);
-                        subscriberService.saveSubscriber(subscriber);
+                        subscriberService.updateSubscriber(phoneNumber,subscriber);
                         return new ResponseEntity<Loans>(loansRepository.save(loan),HttpStatus.OK);
                     } else {
                         return new ResponseEntity<>(new ErrorResponse("the amount exceeds the allowable limit. You can access Ksh. "+ subscriber.getBorrowableAmount()),HttpStatus.BAD_REQUEST);
